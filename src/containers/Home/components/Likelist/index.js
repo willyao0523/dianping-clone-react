@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './style.css'
 import LikeItem from '../LikeItem'
+import Loading from '../../../../components/Loading'
 
 /**
  * id
@@ -77,23 +78,77 @@ const dataSource = [
 ];
 
 class LikeList extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      data: dataSource,
+      loadTime: 1,
+    }
+    this.likeRef = React.createRef()
+    this.removeListener = false
+  }
+
   render() {
-
-    const data = dataSource
-
+    const { data, loadTime } = this.state
     return (
-      <div className="likeList">
+      <div ref={this.likeRef} className="likeList">
         <div className="likeList__header">猜你喜欢</div>
         <div className="likeList__list">
           {
             data.map((item, index) => {
-              return <LikeItem key={item.id} data={item} />
+              return <LikeItem key={index} data={item} />
             })
           }
         </div>
+        {
+          loadTime < 3 ? (
+            <Loading />
+          ) : (
+            <a className="likeList__viewAll">
+              查看更多
+            </a>
+          )
+        }
       </div>
     );
   }
+
+  componentDidMount() {
+    document.addEventListener("scroll", this.handleScroll)
+  }
+
+  componentDidUpdate() {
+    if(this.state.loadTime >= 3 && !this.removeListener) {
+      document.removeEventListener("scroll", this.handleScroll)
+      this.removeListener = true      
+    }
+  }
+
+  componentWillUnmount() {
+    if(!this.removeListener) {
+      document.removeEventListener("scroll", this.handleScroll)
+    }
+  }
+
+  handleScroll = () => {
+    const scrollTop = document.documentElement.scrollTop ||
+      document.body.scrollTop
+    const screenHeight = document.documentElement.clientHeight
+    const likeListTop = this.likeRef.current.offsetTop
+    const likeLikeHeight = this.likeRef.current.offsetHeight
+    if(scrollTop >= likeLikeHeight + likeListTop - screenHeight) {
+      const newData = this.state.data.concat(dataSource)
+      const newLoadTimes = this.state.loadTime + 1
+      setTimeout(() => {
+        this.setState({
+          data: newData,
+          loadTime: newLoadTimes
+        })
+      }, 1000)
+    }
+  }
+
 }
 
 export default LikeList;
