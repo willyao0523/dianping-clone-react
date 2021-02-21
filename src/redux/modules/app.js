@@ -8,9 +8,9 @@ export const types = {
 
 // action creators
 export const actions = {
-  clearError: () => {
+  clearError: () => ({
     type: types.CLEAR_ERROR
-  }
+  })
 }
 
 const reducer = (state = initialState, action) => {
