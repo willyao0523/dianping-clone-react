@@ -1,7 +1,7 @@
 import { get } from "../../utils/requests"
 
-// the identification of the actions need to be processed
-export const FETCH_DATA = 'FETCH_DATA'
+//经过中间件处理的action所具有的标识
+export const FETCH_DATA = 'FETCH DATA'
 
 export default store => next => action => {
   const callAPI = action[FETCH_DATA]
@@ -11,16 +11,16 @@ export default store => next => action => {
 
   const { endpoint, schema, types } = callAPI
   if(typeof endpoint !== 'string') {
-    throw new Error('endpoint should be a string')      
+    throw new Error('endpoint必须为字符串类型的URL')
   }
   if(!schema) {
-    throw new Error('schema is required')      
+    throw new Error('必须指定领域实体的schema')
   }
-  if(!Array.isArray(types) && types.length !== 0) {
-    throw new Error('a array including three action types is required')
+  if(!Array.isArray(types) && types.length !== 3) {
+    throw new Error('需要指定一个包含了3个action type的数组')
   }
   if(!types.every(type => typeof type === 'string')) {
-    throw new Error('action type should be a string')
+    throw new Error('action type必须为字符串类型')
   }
 
   const actionWith = data => {
@@ -33,27 +33,28 @@ export default store => next => action => {
 
   next(actionWith({type: requestType}))
   return fetchData(endpoint, schema).then(
-    response => next(actionWith({
+    response => 
+      next(actionWith({
       type: successType,
-      response
+      response 
     })),
     error => next(actionWith({
       type: failureType,
-      error: error.message || "failed to get the data"
+      error: error.message || '获取数据失败'
     }))
   )
 }
 
-// fetch data execution
+//执行网络请求
 const fetchData = (endpoint, schema) => {
   return get(endpoint).then(data => {
     return normalizeData(data, schema)
   })
 }
 
-// normalize data
+//根据schema, 将获取的数据扁平化处理
 const normalizeData = (data, schema) => {
-  const  { id, name } = schema
+  const {id, name} = schema
   let kvObj = {}
   let ids = []
   if(Array.isArray(data)) {
