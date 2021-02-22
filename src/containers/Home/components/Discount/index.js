@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import "./style.css"
+import { Link } from 'react-router-dom'
 
 const dataSource = [
   {
@@ -41,7 +42,7 @@ const dataSource = [
 class Discount extends Component {
   render() {
 
-    const data = dataSource
+    const {data} = this.props
 
     return (
       <div className="discount">
@@ -54,7 +55,7 @@ class Discount extends Component {
           {
             data.map((item, index) => {
               return (
-                <a key={item.id} className="discount__item" href={item.url}>
+                <Link to={`/detail/${item.id}`} key={item.id} className="discount__item">
                 <div>
                   <img width="100%" height="100%" src={item.picture} />
                 </div>
@@ -69,7 +70,7 @@ class Discount extends Component {
                     {item.oldPrice}
                   </del>
                 </div>
-              </a>
+              </Link>
               )              
             })
           }          

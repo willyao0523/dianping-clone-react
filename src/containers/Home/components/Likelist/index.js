@@ -81,16 +81,12 @@ class LikeList extends Component {
 
   constructor(props) {
     super(props)
-    this.state = {
-      data: dataSource,
-      loadTime: 1,
-    }
     this.likeRef = React.createRef()
     this.removeListener = false
   }
 
   render() {
-    const { data, loadTime } = this.state
+    const { data, pageCount } = this.props
     return (
       <div ref={this.likeRef} className="likeList">
         <div className="likeList__header">猜你喜欢</div>
@@ -102,7 +98,7 @@ class LikeList extends Component {
           }
         </div>
         {
-          loadTime < 3 ? (
+          pageCount < 3 ? (
             <Loading />
           ) : (
             <a className="likeList__viewAll">
@@ -115,11 +111,18 @@ class LikeList extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener("scroll", this.handleScroll)
+    if(this.props.pageCount < 3) {
+      document.addEventListener("scroll", this.handleScroll)
+    } else {
+      this.removeListener = true
+    }  
+    if(this.props.pageCount === 0) {
+      this.props.fetchData()
+    }      
   }
 
   componentDidUpdate() {
-    if(this.state.loadTime >= 3 && !this.removeListener) {
+    if(this.props.pageCount >= 3 && !this.removeListener) {
       document.removeEventListener("scroll", this.handleScroll)
       this.removeListener = true      
     }
@@ -138,14 +141,15 @@ class LikeList extends Component {
     const likeListTop = this.likeRef.current.offsetTop
     const likeLikeHeight = this.likeRef.current.offsetHeight
     if(scrollTop >= likeLikeHeight + likeListTop - screenHeight) {
-      const newData = this.state.data.concat(dataSource)
-      const newLoadTimes = this.state.loadTime + 1
-      setTimeout(() => {
-        this.setState({
-          data: newData,
-          loadTime: newLoadTimes
-        })
-      }, 1000)
+      this.props.fetchData()
+      // const newData = this.state.data.concat(dataSource)
+      // const newLoadTimes = this.state.loadTime + 1
+      // setTimeout(() => {
+      //   this.setState({
+      //     data: newData,
+      //     loadTime: newLoadTimes
+      //   })
+      // }, 1000)
     }
   }
 
