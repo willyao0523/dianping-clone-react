@@ -29,7 +29,7 @@ class Detail extends Component {
                 48元
               </td>                            
             </tr>
-            <tr>
+            <tr className="detail__row">
                 <td></td>
                 <td className="detail__td--price">
                   最高价值
