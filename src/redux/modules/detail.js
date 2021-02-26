@@ -1,7 +1,8 @@
+import {combineReducers} from 'redux'
 import url from '../../utils/url'
 import {FETCH_DATA} from '../middlewares/api'
-import {schema as productSchema, getProductDetail} from './entities/products'
-import {schema as shopSchema} from './entities/shops'
+import {schema as productSchema, getProductDetail, getProductById} from './entities/products'
+import {getShopById, schema as shopSchema} from './entities/shops'
 
 export const types = {
   // 获取产品详情的action types
@@ -18,7 +19,7 @@ export const actions = {
   // 获取商品信息
   loadProductDetail: id => {
     return (dispatch, getState) => {
-      const product = getProductDetail(getState, getState(), id)
+      const product = getProductDetail( getState(), id)
       if(product) {
         return dispatch(fetchProductDetailSuccess(id))
       }
@@ -29,7 +30,7 @@ export const actions = {
   // 获取店铺信息
   loadShopById: id => {
     return (dispatch, getState) => {
-      const shop = getShopById(getState, getState(), id)
+      const shop = getShopById( getState(), id)
       if(shop) {
         return dispatch(fetchShopSuccess(id))
       }
@@ -86,10 +87,52 @@ const initialState = {
   }
 }
 
-
-
-const reducer = (state = {}, action) => {
-  return state;
+const product = (state = initialState.product, action) => {
+  switch (action.type) {
+    case types.FETCH_PRODUCT_DETAIL_SUCCESS:
+      return {...state, isFetching: true}
+    case  types.FETCH_PRODUCT_DETAIL_SUCCESS:
+      return {...state, id: action.id, isFetching: false}
+    case types.FETCH_PRODUCT_DETAIL_FAILURE:
+      return {...state, isFetching: false, id: null} 
+    default:
+      return state  
+  }
 }
 
+const relatedShop = (state = initialState.relatedShop, action) => {
+  switch (action.type) {
+    case types.FETCH_SHOP_REQUEST:
+      return {...state, isFetching: true}
+    case  types.FETCH_SHOP_SUCCESS:
+      return {...state, id: action.id, isFetching: false}
+    case types.FETCH_SHOP_FAILURE:
+      return {...state, isFetching: false, id: null} 
+    default:
+      return state
+  }
+}
+
+
+const reducer = combineReducers({
+  product,
+  relatedShop
+})
+
 export default reducer;
+
+// selectors
+// 获取商品详情信息
+export const getProduct = (state, id) => {
+  return getProductDetail(state, id)
+}
+
+export const getRelatedShop = (state, productId) => {
+  const product = getProductById(state, productId)
+  let shopId = product ? product.nearestShop : null
+  if(shopId) {
+    return getShopById(state, shopId)
+  }
+  return null
+}
+
