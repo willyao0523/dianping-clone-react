@@ -8,6 +8,7 @@ import{BrowserRouter as Router, Route, Switch} from 'react-router-dom'
 import Home from '../Home'
 import ProductDetail from '../ProductDetail'
 import Search from '../Search'
+import SearchResult from '../SearchResult'
 
 
 class APP extends Component {
@@ -19,7 +20,8 @@ class APP extends Component {
           <Switch>
             <Route path="/detail/:id" component={ProductDetail} />
             <Route path="/search" component={Search} />
-            <Route path="/" component={Home} />            
+            <Route path="/search_result" component={SearchResult} /> 
+            <Route path="/" component={Home} />                      
           </Switch>
         </Router>
         { error ? <ErrorToast msg={error} clearError={clearError} /> : null}

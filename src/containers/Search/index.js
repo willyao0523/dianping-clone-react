@@ -64,15 +64,17 @@ class Search extends Component {
   // 取消搜索
   handleCancel = () => {
     this.handleClearInput()
-    this.props.histoty.goback()
+    this.props.history.goBack()
   }
 
   // 处理关键词的逻辑
   handleClickItem = (item) => {
-    const {setInputText, addHistoryKeywords} = this.props.searchActions
+    const {setInputText, addHistoryKeywords, loadRelatedShops} = this.props.searchActions
     setInputText(item.keyword)
     addHistoryKeywords(item.id)
+    loadRelatedShops(item.id)
     // 跳转到搜索页面逻辑
+    this.props.history.push("/search_result")
   }
 
   // 清楚历史记录
