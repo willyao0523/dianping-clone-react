@@ -5,18 +5,30 @@ const data = ['三里屯','朝阳大悦城','西单','海底捞','星巴克','�
 
 class PopularSearch extends Component {
   render() {
+    const {data} = this.props;
     return (
       <div className="popularSearch">
         {
           data.map((item, index) => {
             return (
-              <span key={index} className="popularSearch__item">{item}</span>
+              <span 
+                key={item.id} className="popularSearch__item"
+                onClick={this.handleClick.bind(this,item)
+              }>
+                {item.keyword}
+              </span>
             )
           })
         }
       </div>
     );
   }
+
+  handleClick = (item) => {
+    this.props.handleClickItem(item);
+  }
 }
+
+
 
 export default PopularSearch;

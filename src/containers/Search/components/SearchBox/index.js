@@ -39,14 +39,15 @@ class SearchBox extends Component {
   }
 
   render() {
+    const {inputText, relatedKeywords} = this.props;
     return (
       <div className="searchBox">
         <div className="searchBox__container">
-          <input className="searchBox__text" value={this.state.inputText} onChange={this.handleChange} />
+          <input className="searchBox__text" value={inputText} onChange={this.handleChange} />
           <span className="searchBox__clear" onClick={this.handleClear}></span>
           <span className="searchBox__cancel" onClick={this.handleCancel}>取消</span>
         </div>
-        {this.state.inputText.length > 0 ? this.renderSuggestList() : null}
+        {relatedKeywords.length > 0 ? this.renderSuggestList() : null}
       </div>
     );
   }
@@ -55,9 +56,9 @@ class SearchBox extends Component {
     return (
       <ul className="searchBox__list">
         {
-          data.map(item => {
+          this.props.relatedKeywords.map(item => {
             return (
-              <li className="searchBox__item">
+              <li className="searchBox__item" key={item.id} onClick={this.handleClickItem.bind(this, item)}>
                 <span className="searchBox__itemKeyword">{item.keyword}</span>
                 <span className="searchBox__itemQuantity">约{item.quantity}个结果</span>
               </li>
@@ -69,19 +70,19 @@ class SearchBox extends Component {
   }
 
   handleChange = (e) => {
-    this.setState({
-      inputText: e.target.value
-    })
+    this.props.onChange(e.target.value)
   }
 
   handleClear = () => {
-    this.setState({
-      inputText: ""
-    })
+    this.props.onClear()
   }
 
   handleCancel = () => {
+    this.props.onCancel()
+  }
 
+  handleClickItem = (item) => {
+    this.props.onClickItem(item)
   }
 
 }
