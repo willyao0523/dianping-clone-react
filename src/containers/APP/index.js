@@ -9,6 +9,9 @@ import Home from '../Home'
 import ProductDetail from '../ProductDetail'
 import Search from '../Search'
 import SearchResult from '../SearchResult'
+import Login from '../Login';
+import PrivateRoute from '../PrivateRoute'
+import User from '../User'
 
 
 class APP extends Component {
@@ -20,7 +23,9 @@ class APP extends Component {
           <Switch>
             <Route path="/detail/:id" component={ProductDetail} />
             <Route path="/search" component={Search} />
-            <Route path="/search_result" component={SearchResult} /> 
+            <PrivateRoute path="/user" component={User}/>
+            <Route path="/search_result" component={SearchResult} />
+            <Route path="/login" component={Login} /> 
             <Route path="/" component={Home} />                      
           </Switch>
         </Router>
