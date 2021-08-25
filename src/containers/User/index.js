@@ -1,12 +1,26 @@
 import React, { Component } from 'react';
+import UserMain from './components/UserMain'
+import UserHeader from './components/UserHeader'
 
 class User extends Component {
   render() {
     return (
       <div>
-        中心页面
+        <UserHeader 
+          onBack={this.handleBack}
+          onLogout={this.handleLogout}
+        />
+        <UserMain />
       </div>
     );
+  }
+
+  handleBack = () => {
+
+  }
+
+  handleLogout = () => {
+
   }
 }
 

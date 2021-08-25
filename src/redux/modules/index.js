@@ -4,7 +4,8 @@ import home from "./home";
 import detail from "./detail";
 import app from "./app";
 import search from "./search";
-import login from "./login"
+import login from "./login";
+import user from "./user";
 
 /**
  * combine to root reducer with UI states and domain states
@@ -17,7 +18,8 @@ const rootReducer = combineReducers({
   detail,
   app,
   search,
-  login
+  login,
+  user,
 })
 
 export default rootReducer;
