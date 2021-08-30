@@ -16,7 +16,7 @@ class UserHeader extends Component {
         </div>
         <div 
           className="userHeader__right"
-          onClick="onLogout"
+          onClick={onLogout}
         >注销</div>
         
       </header>
