@@ -11,6 +11,10 @@ import {
   types as orderTypes
 } from './entities/orders'
 
+import {   
+  actions as commentActions
+} from './entities/comments'
+
 const initialState = {
   orders: {
     isFetching: false,
@@ -22,7 +26,10 @@ const initialState = {
   currentTab: 0,
   currentOrder: {
     id: null,
-    isDeleting: false
+    isDeleting: false,
+    isCommenting: false,
+    comment: '',
+    stars: 0,
   }
 }
 
@@ -38,6 +45,17 @@ export const types = {
 
   SHOW_DELETE_DIALOG: 'USER/SHOW_DELETE_DIALOG',
   HIDE_DELETE_DIALOG: 'USER/HIDE_DELETE_DIALOG',
+
+  SHOW_COMMENT_AREA: 'USER/SHOW_COMMENT_AREA',
+  HIDE_COMMENT_AREA: 'USER/HIDE_COMMENT_AREA',
+
+  SET_COMMENT: 'USER/SET_COMMENT',
+  SET_STARS: 'USER/SET_STARS',
+
+  POST_COMMENT_REQUEST: 'USER/POST_COMMENT_REQUEST',
+  POST_COMMENT_SUCCESS: 'USER/POST_COMMENT_SUCCESS',
+  POST_COMMENT_FAILURE: 'USER/POST_COMMENT_FAILURE',  
+
 }
 
 export const actions = {
@@ -76,8 +94,50 @@ export const actions = {
   }),
   hideDeleteDialog: () => ({
     type: types.HIDE_DELETE_DIALOG,
-  })
+  }),
+  showCommentArea: orderId => ({
+    type: types.SHOW_COMMENT_AREA,
+    orderId
+  }),
+  hideCommentArea: () => ({
+    type: types.HIDE_COMMENT_AREA,    
+  }),
+  setComment: (comment) => ({
+    type: types.SET_COMMENT,
+    comment
+  }),
+  setStars: stars => ({
+    type: types.SET_STARS,
+    stars
+  }),
+  submitComment: () => {
+    return (dispatch, getState) => {
+      dispatch(postCommentRequest())      
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          const {currentOrder: {id, comment, stars}} = getState().user
+          const commentObj = {
+            id: +new Date(),
+            stars,
+            content: comment
+          }
+          dispatch(postCommentSuccess())
+          dispatch(commentActions.addComment(commentObj))
+          dispatch(orderActions.addComment(id, commentObj.id))
+          resolve()
+        }, 500)
+      })
+    }
+  }
 }
+
+const postCommentRequest = () => ({
+  type: types.POST_COMMENT_REQUEST
+})
+
+const postCommentSuccess = () => ({
+  type: types.POST_COMMENT_SUCCESS
+})
 
 const deleteOrderRequest = () => ({
   type: types.DELETE_ORDERS_REQUEST
@@ -159,10 +219,23 @@ const currentOrder = (state = initialState.currentOrder, action) => {
         id: action.orderId,
         isDeleting: true
       }
+    case types.SHOW_COMMENT_AREA:
+      return {
+        ...state,
+        id: action.orderId,
+        isCommenting: true
+      }          
     case types.HIDE_DELETE_DIALOG:      
+    case types.HIDE_DELETE_DIALOG:
     case types.DELETE_ORDERS_FAILURE:
     case types.DELETE_ORDERS_SUCCESS:
+    case types.POST_COMMENT_SUCCESS:
+    case types.POST_COMMENT_FAILURE:
       return initialState.currentOrder
+    case types.SET_COMMENT:
+      return {...state, comment: action.comment}
+    case types.SET_STARS:
+      return {...state, stars: action.stars}
     default:
       return state;
   }
@@ -189,4 +262,17 @@ export const getOrders = state => {
 export const getDeletingOrderId = state => {
   return state.user.currentOrder && state.user.currentOrder.isDeleting ? 
             state.user.currentOrder.id : null;
+}
+
+export const getCommentingOrderId = state => {
+  return state.user.currentOrder && state.user.currentOrder.isCommenting ? 
+            state.user.currentOrder.id : null;
+}
+
+export const getCurrentOrderComment = state => {
+  return state.user.currentOrder.comment ? state.user.currentOrder.comment : ''
+}
+
+export const getCurrentOrderStars = state => {
+  return state.user.currentOrder.stars ? state.user.currentOrder.stars : 0
 }

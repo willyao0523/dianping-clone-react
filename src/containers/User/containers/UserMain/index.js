@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux'
-import {actions as userActions, getCurrentTab, getDeletingOrderId} from '../../../../redux/modules/user'
+import {actions as userActions, getCurrentTab, getDeletingOrderId,
+getCurrentOrderComment, getCurrentOrderStars, getCommentingOrderId} from '../../../../redux/modules/user'
 import Confirm from '../../../../components/Confirm'
 import OrderItem from '../../components/OrderItem'
 import './style.css'
@@ -66,23 +67,21 @@ class UserMain extends Component {
     );    
   }
 
-  handleClickTab = (index) => {
-    // this.setState({
-    //   currentTab: index
-    // })
-    this.props.userActions.setCurrentTab(index)
-  }
-
-  // TODO
-  handleRemove = (orderId) => {
-    this.props.userActions.showDeleteDialog(orderId)
-  }
-
   renderOrderList = (data) => {
-    
+    const {commentingOrderId, orderComment, orderStars} = this.props
     return data.map(item => {
       return (
-        <OrderItem key={item.id} data={item} onRemove={this.handleRemove.bind(this, item.id)}/>
+        <OrderItem key={item.id} data={item} 
+        isCommenting={item.id === commentingOrderId}
+        comment={item.id === commentingOrderId ? orderComment : ''}
+        stars={item.id === commentingOrderId ? orderStars : 0}
+        onCommentChange={this.handleCommentChange}
+        onStarChange={this.handleStarsChange}
+        onComment={this.handleComment.bind(this, item.id)}
+        onRemove={this.handleRemove.bind(this, item.id)}
+        onSubmitComment={this.handleSubmitComment}
+        onCancelComment={this.handleCancelComment}
+        />
       )      
     })
   }
@@ -114,12 +113,47 @@ class UserMain extends Component {
     )
   }
 
+  handleClickTab = (index) => {
+    // this.setState({
+    //   currentTab: index
+    // })
+    this.props.userActions.setCurrentTab(index)
+  }
+
+  // TODO
+  handleRemove = (orderId) => {
+    this.props.userActions.showDeleteDialog(orderId)
+  }
+
+  handleCommentChange = comment => {
+    this.props.userActions.setComment(comment)
+  }
+
+  handleStarsChange = stars => {
+    this.props.userActions.setStars(stars)
+  }
+
+  handleComment = orderId => {
+    this.props.userActions.showCommentArea(orderId)
+  }
+
+  handleSubmitComment = () => {
+    this.props.userActions.submitComment()
+  }
+
+  handleCancelComment = () => {
+    this.props.userActions.hideCommentArea()
+  }
+
 }
 
 const mapStateToProps = (state, props) => {
   return {
     currentTab: getCurrentTab(state),
-    deletingOrderId: getDeletingOrderId(state)
+    deletingOrderId: getDeletingOrderId(state),
+    commentingOrderId: getCommentingOrderId(state),
+    orderComment: getCurrentOrderComment(state),
+    orderStars: getCurrentOrderStars(state),
   }
 }
 
