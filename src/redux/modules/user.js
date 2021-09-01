@@ -15,9 +15,16 @@ import {
   actions as commentActions
 } from './entities/comments'
 
+const typeToKey = {
+  [TO_PAY_TYPE]: 'toPayIds',
+  [AVAILABLE_TYPE]: 'availableIds',
+  [REFUND_TYPE]: 'refundIds',
+}
+
 const initialState = {
   orders: {
     isFetching: false,
+    fetched: false,
     ids: [],
     toPayIds: [],
     availableIds: [],
@@ -61,8 +68,8 @@ export const types = {
 export const actions = {
   loadOrders: () => {
     return (dispath, getState) => {
-      const { ids } = getState().user.orders
-      if(ids.length > 0) {
+      const { ids, fetched } = getState().user.orders
+      if(fetched) {
         return null;
       }
       const endpoint = url.getOrders();
@@ -179,6 +186,7 @@ const orders = (state = initialState.orders, action) => {
       return {
         ...state,
         isFetching: false,
+        fetched: true,
         ids: state.ids.concat(action.response.ids),
         toPayIds: state.toPayIds.concat(toPayIds),
         availableIds: state.availableIds.concat(availableIds),
@@ -193,6 +201,17 @@ const orders = (state = initialState.orders, action) => {
         availableIds: removeOrderId(state, 'availableIds', action.orderId),
         refundIds: removeOrderId(state, 'refundIds', action.orderId),
       }
+    case orderTypes.ADD_ORDER:
+      const {order} = action
+      const key = typeToKey[order.type]
+      return key ? {
+        ...state,
+        ids: [order.id].concat(state.ids),
+        [key]: [order.id].concat(state[key]),
+      } : {
+        ...state,
+        ids: [order.id].concat(state.ids),
+      }      
     default:
       return state;    
   }

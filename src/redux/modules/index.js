@@ -6,6 +6,7 @@ import app from "./app";
 import search from "./search";
 import login from "./login";
 import user from "./user";
+import purchase from './purchase'
 
 /**
  * combine to root reducer with UI states and domain states
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   search,
   login,
   user,
+  purchase
 })
 
 export default rootReducer;
