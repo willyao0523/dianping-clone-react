@@ -4,14 +4,14 @@ import PurchaseForm from './components/PurchaseForm'
 import Tip from '../../components/Tip'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import {actions as purchaseActions, getQuantity, getTipStatus, getProduct} from '../../redux/modules/purchase'
+import {actions as purchaseActions, getQuantity, getTipStatus, getTotalPrice, getProduct} from '../../redux/modules/purchase'
 import {getUsername} from '../../redux/modules/login'
 import {actions as detailActions} from '../../redux/modules/detail'
 
 
 class Purchase extends Component {
   render() {
-    const {quantity, tipStatus, product, phone} = this.props
+    const {quantity, tipStatus, product, phone, totalPrice} = this.props
     return (
       <div>
         <Header title="下单" onBack={this.handleBack} />
@@ -20,6 +20,7 @@ class Purchase extends Component {
           quantity={quantity} 
           phone={phone} 
           product={product}
+          totalPrice={totalPrice}
           onSetQuantity={this.handleSetQuantity}
           onSubmit={this.handleSubmit}
         /> : null}
@@ -69,6 +70,7 @@ const mapStateToProps = (state, props) => {
     quantity: getQuantity(state),
     tipStatus: getTipStatus(state),
     phone: getUsername(state),
+    totalPrice: getTotalPrice(state, productId)
   }
 }
 
